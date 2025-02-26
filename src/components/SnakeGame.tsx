@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Sun, Moon } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Sun,
+  Moon,
+} from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -41,6 +48,11 @@ export default function SnakeGame() {
   const [touchStart, setTouchStart] = useState<Position | null>(null);
   const [theme, setTheme] = useState<Theme>(getStoredTheme());
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -88,11 +100,15 @@ export default function SnakeGame() {
       let newDirection: Direction | null = null;
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 0 && (direction !== "LEFT" || !isGameStarted)) newDirection = "RIGHT";
-        else if (deltaX < 0 && (direction !== "RIGHT" || !isGameStarted)) newDirection = "LEFT";
+        if (deltaX > 0 && (direction !== "LEFT" || !isGameStarted))
+          newDirection = "RIGHT";
+        else if (deltaX < 0 && (direction !== "RIGHT" || !isGameStarted))
+          newDirection = "LEFT";
       } else {
-        if (deltaY > 0 && (direction !== "UP" || !isGameStarted)) newDirection = "DOWN";
-        else if (deltaY < 0 && (direction !== "DOWN" || !isGameStarted)) newDirection = "UP";
+        if (deltaY > 0 && (direction !== "UP" || !isGameStarted))
+          newDirection = "DOWN";
+        else if (deltaY < 0 && (direction !== "DOWN" || !isGameStarted))
+          newDirection = "UP";
       }
 
       if (newDirection) {
@@ -293,7 +309,7 @@ export default function SnakeGame() {
       {!isGameStarted && !gameOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
           <div className="text-center animate-[bounce_2s_ease-in-out_infinite] transition-all">
-            <div className="grid grid-cols-3 gap-4 p-4 relative w-[280px] h-[280px] place-items-center">
+            <div className="grid grid-cols-3 gap-4 p-4 relative min-w-[320px] min-h-[320px] place-items-center">
               <div></div>
               <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
                 <ArrowUp size={36} />
@@ -303,9 +319,8 @@ export default function SnakeGame() {
                 <ArrowLeft size={36} />
               </div>
               <div className="flex items-center justify-center">
-                <div className="text-xl md:text-2xl font-bold text-white text-center max-w-[140px] leading-tight">
-                  Use arrows
-                  or swipe
+                <div className="text-2xl md:text-3xl font-bold text-white text-center max-w-[180px] leading-relaxed">
+                  {isTouchDevice ? "Swipe to start" : "Use arrows to start"}
                 </div>
               </div>
               <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
