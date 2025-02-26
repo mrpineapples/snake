@@ -1,11 +1,7 @@
-import SnakeGame from './components/SnakeGame'
+import SnakeGame from "./components/SnakeGame";
 
 function App() {
-  return (
-    <div className="min-h-screen bg-gray-900">
-      <SnakeGame />
-    </div>
-  )
+  return <SnakeGame />;
 }
 
-export default App
+export default App;
