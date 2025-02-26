@@ -14,6 +14,7 @@ export default function SnakeGame() {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [showGrid, setShowGrid] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const gridSize = 20;
 
@@ -33,7 +34,7 @@ export default function SnakeGame() {
   }, [snake, gridSize]);
 
   const moveSnake = useCallback(() => {
-    if (gameOver) return;
+    if (gameOver || isPaused) return;
 
     setSnake((prevSnake: Position[]) => {
       const newSnake = [...prevSnake];
@@ -83,11 +84,18 @@ export default function SnakeGame() {
       newSnake.unshift(head);
       return newSnake;
     });
-  }, [direction, food, gameOver, generateFood, gridSize]);
+  }, [direction, food, gameOver, generateFood, gridSize, isPaused]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (gameOver) return;
+
+      if (e.code === "Space" && document.activeElement?.tagName !== "BUTTON") {
+        setIsPaused((prev) => !prev);
+        return;
+      }
+
+      if (isPaused) return;
 
       let newDirection: Direction | null = null;
 
@@ -113,7 +121,7 @@ export default function SnakeGame() {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [direction, gameOver]);
+  }, [direction, gameOver, isPaused]);
 
   useEffect(() => {
     const gameLoop = setInterval(moveSnake, 150);
@@ -125,6 +133,7 @@ export default function SnakeGame() {
     setDirection("RIGHT");
     setGameOver(false);
     setScore(0);
+    setIsPaused(false);
     generateFood();
   };
 
@@ -163,17 +172,30 @@ export default function SnakeGame() {
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
       <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
         <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
-        <button
-          onClick={() => setShowGrid(!showGrid)}
-          className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors shadow-md"
-        >
-          {showGrid ? "Hide Grid" : "Show Grid"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsPaused(prev => !prev)}
+            className="px-4 py-2 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors shadow-md"
+          >
+            {isPaused ? "Resume" : "Pause"}
+          </button>
+          <button
+            onClick={() => setShowGrid(!showGrid)}
+            className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+          >
+            {showGrid ? "Hide Grid" : "Show Grid"}
+          </button>
+        </div>
       </div>
-      <div className="w-full max-w-[95vw] md:max-w-[540px] aspect-square">
+      <div className="w-full max-w-[95vw] md:max-w-[540px] aspect-square relative">
         <div className="grid grid-cols-20 gap-0 bg-gray-800 border-2 border-gray-700 rounded-lg shadow-lg w-full h-full">
           {renderGrid()}
         </div>
+        {isPaused && !gameOver && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+            <p className="text-3xl md:text-4xl font-bold text-white">PAUSED</p>
+          </div>
+        )}
       </div>
       {gameOver && (
         <div className="mt-6 text-center">
