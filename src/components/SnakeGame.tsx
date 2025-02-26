@@ -182,19 +182,22 @@ export default function SnakeGame() {
   const renderCell = (x: number, y: number) => {
     const isSnake = snake.some((segment) => segment.x === x && segment.y === y);
     const isFood = food.x === x && food.y === y;
+    const isTopLeft = x === 0 && y === 0;
+    const isTopRight = x === gridSize - 1 && y === 0;
+    const isBottomLeft = x === 0 && y === gridSize - 1;
+    const isBottomRight = x === gridSize - 1 && y === gridSize - 1;
+
+    const cornerClasses = [
+      isTopLeft && 'rounded-tl-[0.5rem]',
+      isTopRight && 'rounded-tr-[0.5rem]',
+      isBottomLeft && 'rounded-bl-[0.5rem]',
+      isBottomRight && 'rounded-br-[0.5rem]'
+    ].filter(Boolean).join(' ');
 
     return (
       <div
         key={`${x}-${y}`}
-        className={`w-full h-full inline-block ${
-          showGrid ? "border border-gray-700" : ""
-        } ${
-          isSnake
-            ? "bg-green-500"
-            : isFood
-            ? "bg-red-500 rounded-full"
-            : "bg-gray-800"
-        }`}
+        className={`w-full h-full inline-block ${cornerClasses} ${showGrid ? "border border-gray-700" : ""} ${isSnake ? "bg-green-500" : isFood ? "bg-red-500 rounded-full" : "bg-gray-800"}`}
       />
     );
   };
@@ -230,7 +233,7 @@ export default function SnakeGame() {
         </div>
       </div>
       <div className="w-full max-w-[95vw] md:max-w-[540px] aspect-square relative">
-        <div className="grid grid-cols-20 gap-0 bg-gray-800 border-2 border-gray-700 rounded-lg shadow-lg w-full h-full">
+        <div className="grid grid-cols-20 gap-0 bg-gray-800 border-2 border-gray-700 rounded-[0.75rem] overflow-hidden shadow-lg w-full h-full">
           {renderGrid()}
         </div>
         {isPaused && !gameOver && (
