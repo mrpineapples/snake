@@ -1,6 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
 
+type Theme = "light" | "dark";
+
+const getSystemTheme = (): Theme => {
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    return "dark";
+  }
+  return "light";
+};
+
+const getStoredTheme = (): Theme => {
+  const storedTheme = localStorage.getItem("theme") as Theme;
+  return storedTheme || getSystemTheme();
+};
+
 type Position = {
   x: number;
   y: number;
@@ -18,6 +35,24 @@ export default function SnakeGame() {
   const [showGrid, setShowGrid] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<Position | null>(null);
+  const [theme, setTheme] = useState<Theme>(getStoredTheme());
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("theme")) {
+        setTheme(e.matches ? "dark" : "light");
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
@@ -201,10 +236,14 @@ export default function SnakeGame() {
           isTopRight && "rounded-tr-[0.5rem]",
           isBottomLeft && "rounded-bl-[0.5rem]",
           isBottomRight && "rounded-br-[0.5rem]",
-          showGrid && "border border-gray-700",
+          showGrid && theme === "dark"
+            ? "border border-gray-700"
+            : showGrid
+            ? "border border-gray-700"
+            : "",
           {
             "bg-green-500": isSnake,
-            "bg-gray-800": !isSnake && !isFood,
+            [theme === "dark" ? "bg-gray-800" : "bg-gray-300"]: !isSnake,
           }
         )}
       >
@@ -224,7 +263,14 @@ export default function SnakeGame() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4 overscroll-none touch-none">
+    <div
+      className={clsx(
+        "flex flex-col items-center min-h-screen p-4 overscroll-none touch-none transition-colors",
+        theme === "dark"
+          ? "bg-gray-900 text-white"
+          : "bg-gray-100 text-gray-900"
+      )}
+    >
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
       <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
         <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
@@ -247,10 +293,25 @@ export default function SnakeGame() {
           >
             {showGrid ? "Hide Grid" : "Show Grid"}
           </button>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className={clsx(
+              "px-4 py-2 text-sm rounded-lg transition-colors shadow-md",
+              theme === "dark"
+                ? "bg-yellow-500 hover:bg-yellow-600 text-gray-900"
+                : "bg-indigo-500 hover:bg-indigo-600 text-white"
+            )}
+          >
+            {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+          </button>
         </div>
       </div>
       <div className="w-full max-w-[95vw] md:max-w-[540px] aspect-square relative">
-        <div className="grid grid-cols-20 gap-0 bg-gray-800 border-2 border-gray-700 rounded-[0.75rem] overflow-hidden shadow-lg w-full h-full">
+        <div
+          className={clsx(
+            "grid grid-cols-20 gap-0 border-2 rounded-[10px] overflow-hidden shadow-lg w-full h-full transition-colors bg-gray-700 border-gray-700"
+          )}
+        >
           {renderGrid()}
         </div>
         {isPaused && !gameOver && (
