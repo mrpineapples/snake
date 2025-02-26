@@ -29,7 +29,7 @@ export default function SnakeGame() {
   const gridSize = 20;
   const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Position>({ x: 5, y: 5 });
-  const [direction, setDirection] = useState<Direction>("RIGHT");
+  const [direction, setDirection] = useState<Direction | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [showGrid, setShowGrid] = useState(() => {
@@ -39,6 +39,7 @@ export default function SnakeGame() {
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<Position | null>(null);
   const [theme, setTheme] = useState<Theme>(getStoredTheme());
+  const [isGameStarted, setIsGameStarted] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -119,7 +120,7 @@ export default function SnakeGame() {
   }, [snake, gridSize]);
 
   const moveSnake = useCallback(() => {
-    if (gameOver || isPaused) return;
+    if (gameOver || isPaused || !isGameStarted || !direction) return;
 
     setSnake((prevSnake: Position[]) => {
       const newSnake = [...prevSnake];
@@ -186,21 +187,24 @@ export default function SnakeGame() {
 
       switch (e.key) {
         case "ArrowUp":
-          if (direction !== "DOWN") newDirection = "UP";
+          if (!isGameStarted || direction !== "DOWN") newDirection = "UP";
           break;
         case "ArrowDown":
-          if (direction !== "UP") newDirection = "DOWN";
+          if (!isGameStarted || direction !== "UP") newDirection = "DOWN";
           break;
         case "ArrowLeft":
-          if (direction !== "RIGHT") newDirection = "LEFT";
+          if (!isGameStarted || direction !== "RIGHT") newDirection = "LEFT";
           break;
         case "ArrowRight":
-          if (direction !== "LEFT") newDirection = "RIGHT";
+          if (!isGameStarted || direction !== "LEFT") newDirection = "RIGHT";
           break;
       }
 
       if (newDirection) {
         setDirection(newDirection);
+        if (!isGameStarted) {
+          setIsGameStarted(true);
+        }
       }
     };
 
@@ -215,10 +219,11 @@ export default function SnakeGame() {
 
   const resetGame = () => {
     setSnake([{ x: 10, y: 10 }]);
-    setDirection("RIGHT");
+    setDirection(null);
     setGameOver(false);
     setScore(0);
     setIsPaused(false);
+    setIsGameStarted(false);
     generateFood();
   };
 
@@ -275,6 +280,11 @@ export default function SnakeGame() {
       )}
     >
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
+      {!isGameStarted && !gameOver && (
+        <div className="mb-4 text-xl text-center">
+          Press an arrow key to start the game
+        </div>
+      )}
       <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
         <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
         <div className="flex gap-2">
