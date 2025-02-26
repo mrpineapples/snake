@@ -32,7 +32,10 @@ export default function SnakeGame() {
   const [direction, setDirection] = useState<Direction>("RIGHT");
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(() => {
+    const storedGridVisibility = localStorage.getItem("showGrid");
+    return storedGridVisibility === "true";
+  });
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<Position | null>(null);
   const [theme, setTheme] = useState<Theme>(getStoredTheme());
@@ -285,7 +288,11 @@ export default function SnakeGame() {
             {isPaused ? "Resume" : "Pause"}
           </button>
           <button
-            onClick={() => setShowGrid(!showGrid)}
+            onClick={() => {
+              const newShowGrid = !showGrid;
+              setShowGrid(newShowGrid);
+              localStorage.setItem("showGrid", newShowGrid.toString());
+            }}
             className={clsx(
               "px-4 py-2 text-white text-sm rounded-lg transition-colors shadow-md",
               "bg-blue-500 hover:bg-blue-600"
