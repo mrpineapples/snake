@@ -8,6 +8,7 @@ type Position = {
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 
 export default function SnakeGame() {
+  const gridSize = 20;
   const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Position>({ x: 5, y: 5 });
   const [direction, setDirection] = useState<Direction>("RIGHT");
@@ -15,8 +16,49 @@ export default function SnakeGame() {
   const [score, setScore] = useState(0);
   const [showGrid, setShowGrid] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState<Position | null>(null);
 
-  const gridSize = 20;
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!(e.target as HTMLElement).closest('button')) {
+        e.preventDefault();
+      }
+      const touch = e.touches[0];
+      setTouchStart({ x: touch.clientX, y: touch.clientY });
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!(e.target as HTMLElement).closest('button')) {
+        e.preventDefault();
+      }
+      if (!touchStart || gameOver || isPaused) return;
+
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      const minSwipeDistance = 30;
+
+      if (Math.abs(deltaX) < minSwipeDistance && Math.abs(deltaY) < minSwipeDistance) return;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0 && direction !== "LEFT") setDirection("RIGHT");
+        else if (deltaX < 0 && direction !== "RIGHT") setDirection("LEFT");
+      } else {
+        if (deltaY > 0 && direction !== "UP") setDirection("DOWN");
+        else if (deltaY < 0 && direction !== "DOWN") setDirection("UP");
+      }
+
+      setTouchStart(null);
+    };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [direction, gameOver, isPaused, touchStart]);
 
   const generateFood = useCallback((): void => {
     let newFood: Position;
@@ -168,7 +210,7 @@ export default function SnakeGame() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4 overscroll-none touch-none">
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
       <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
         <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
