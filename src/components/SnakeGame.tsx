@@ -84,12 +84,21 @@ export default function SnakeGame() {
       )
         return;
 
+      let newDirection: Direction | null = null;
+
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 0 && direction !== "LEFT") setDirection("RIGHT");
-        else if (deltaX < 0 && direction !== "RIGHT") setDirection("LEFT");
+        if (deltaX > 0 && (direction !== "LEFT" || !isGameStarted)) newDirection = "RIGHT";
+        else if (deltaX < 0 && (direction !== "RIGHT" || !isGameStarted)) newDirection = "LEFT";
       } else {
-        if (deltaY > 0 && direction !== "UP") setDirection("DOWN");
-        else if (deltaY < 0 && direction !== "DOWN") setDirection("UP");
+        if (deltaY > 0 && (direction !== "UP" || !isGameStarted)) newDirection = "DOWN";
+        else if (deltaY < 0 && (direction !== "DOWN" || !isGameStarted)) newDirection = "UP";
+      }
+
+      if (newDirection) {
+        setDirection(newDirection);
+        if (!isGameStarted) {
+          setIsGameStarted(true);
+        }
       }
 
       setTouchStart(null);
