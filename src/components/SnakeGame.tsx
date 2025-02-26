@@ -21,7 +21,7 @@ export default function SnakeGame() {
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
-      if (!(e.target as HTMLElement).closest('button')) {
+      if (!(e.target as HTMLElement).closest("button")) {
         e.preventDefault();
       }
       const touch = e.touches[0];
@@ -29,7 +29,7 @@ export default function SnakeGame() {
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!(e.target as HTMLElement).closest('button')) {
+      if (!(e.target as HTMLElement).closest("button")) {
         e.preventDefault();
       }
       if (!touchStart || gameOver || isPaused) return;
@@ -39,7 +39,11 @@ export default function SnakeGame() {
       const deltaY = touch.clientY - touchStart.y;
       const minSwipeDistance = 30;
 
-      if (Math.abs(deltaX) < minSwipeDistance && Math.abs(deltaY) < minSwipeDistance) return;
+      if (
+        Math.abs(deltaX) < minSwipeDistance &&
+        Math.abs(deltaY) < minSwipeDistance
+      )
+        return;
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0 && direction !== "LEFT") setDirection("RIGHT");
@@ -110,7 +114,7 @@ export default function SnakeGame() {
 
       if (
         newSnake
-          .slice(1)
+          .slice(3)
           .some((segment) => segment.x === head.x && segment.y === head.y)
       ) {
         setGameOver(true);
@@ -201,7 +205,7 @@ export default function SnakeGame() {
           {
             "bg-green-500": isSnake,
             "bg-red-500 rounded-full": isFood,
-            "bg-gray-800": !isSnake && !isFood
+            "bg-gray-800": !isSnake && !isFood,
           }
         )}
       />
@@ -225,7 +229,7 @@ export default function SnakeGame() {
         <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
         <div className="flex gap-2">
           <button
-            onClick={() => setIsPaused(prev => !prev)}
+            onClick={() => setIsPaused((prev) => !prev)}
             className={clsx(
               "px-4 py-2 text-white text-sm rounded-lg transition-colors shadow-md",
               "bg-purple-500 hover:bg-purple-600"
