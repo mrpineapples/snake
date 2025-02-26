@@ -196,7 +196,7 @@ export default function SnakeGame() {
       <div
         key={`${x}-${y}`}
         className={clsx(
-          "w-full h-full inline-block",
+          "w-full h-full inline-block relative",
           isTopLeft && "rounded-tl-[0.5rem]",
           isTopRight && "rounded-tr-[0.5rem]",
           isBottomLeft && "rounded-bl-[0.5rem]",
@@ -204,11 +204,12 @@ export default function SnakeGame() {
           showGrid && "border border-gray-700",
           {
             "bg-green-500": isSnake,
-            "bg-red-500 rounded-full": isFood,
             "bg-gray-800": !isSnake && !isFood,
           }
         )}
-      />
+      >
+        {isFood && <div className="absolute inset-0 bg-red-500 rounded-full" />}
+      </div>
     );
   };
 
