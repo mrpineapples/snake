@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import clsx from "clsx";
 
 type Position = {
   x: number;
@@ -187,17 +188,22 @@ export default function SnakeGame() {
     const isBottomLeft = x === 0 && y === gridSize - 1;
     const isBottomRight = x === gridSize - 1 && y === gridSize - 1;
 
-    const cornerClasses = [
-      isTopLeft && 'rounded-tl-[0.5rem]',
-      isTopRight && 'rounded-tr-[0.5rem]',
-      isBottomLeft && 'rounded-bl-[0.5rem]',
-      isBottomRight && 'rounded-br-[0.5rem]'
-    ].filter(Boolean).join(' ');
-
     return (
       <div
         key={`${x}-${y}`}
-        className={`w-full h-full inline-block ${cornerClasses} ${showGrid ? "border border-gray-700" : ""} ${isSnake ? "bg-green-500" : isFood ? "bg-red-500 rounded-full" : "bg-gray-800"}`}
+        className={clsx(
+          "w-full h-full inline-block",
+          isTopLeft && "rounded-tl-[0.5rem]",
+          isTopRight && "rounded-tr-[0.5rem]",
+          isBottomLeft && "rounded-bl-[0.5rem]",
+          isBottomRight && "rounded-br-[0.5rem]",
+          showGrid && "border border-gray-700",
+          {
+            "bg-green-500": isSnake,
+            "bg-red-500 rounded-full": isFood,
+            "bg-gray-800": !isSnake && !isFood
+          }
+        )}
       />
     );
   };
@@ -220,13 +226,19 @@ export default function SnakeGame() {
         <div className="flex gap-2">
           <button
             onClick={() => setIsPaused(prev => !prev)}
-            className="px-4 py-2 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors shadow-md"
+            className={clsx(
+              "px-4 py-2 text-white text-sm rounded-lg transition-colors shadow-md",
+              "bg-purple-500 hover:bg-purple-600"
+            )}
           >
             {isPaused ? "Resume" : "Pause"}
           </button>
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+            className={clsx(
+              "px-4 py-2 text-white text-sm rounded-lg transition-colors shadow-md",
+              "bg-blue-500 hover:bg-blue-600"
+            )}
           >
             {showGrid ? "Hide Grid" : "Show Grid"}
           </button>
@@ -249,7 +261,10 @@ export default function SnakeGame() {
           </p>
           <button
             onClick={resetGame}
-            className="px-6 py-3 bg-green-500 text-white text-lg rounded-lg hover:bg-green-600 transition-colors shadow-md"
+            className={clsx(
+              "px-6 py-3 text-white text-lg rounded-lg transition-colors shadow-md",
+              "bg-green-500 hover:bg-green-600"
+            )}
           >
             Play Again
           </button>
