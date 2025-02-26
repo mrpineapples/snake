@@ -13,6 +13,7 @@ export default function SnakeGame() {
   const [direction, setDirection] = useState<Direction>("RIGHT");
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [showGrid, setShowGrid] = useState(false);
 
   const gridSize = 20;
 
@@ -89,7 +90,7 @@ export default function SnakeGame() {
       if (gameOver) return;
 
       let newDirection: Direction | null = null;
-      
+
       switch (e.key) {
         case "ArrowUp":
           if (direction !== "DOWN") newDirection = "UP";
@@ -134,7 +135,15 @@ export default function SnakeGame() {
     return (
       <div
         key={`${x}-${y}`}
-        className={`w-full h-full inline-block ${isSnake ? "bg-green-500" : isFood ? "bg-red-500 rounded-full" : "bg-gray-800"}`}
+        className={`w-full h-full inline-block ${
+          showGrid ? "border border-gray-700" : ""
+        } ${
+          isSnake
+            ? "bg-green-500"
+            : isFood
+            ? "bg-red-500 rounded-full"
+            : "bg-gray-800"
+        }`}
       />
     );
   };
@@ -150,12 +159,18 @@ export default function SnakeGame() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4">
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
-      <div className="mb-4 text-xl md:text-2xl font-semibold">
-        Score: {score}
+      <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
+        <div className="text-xl md:text-2xl font-semibold">Score: {score}</div>
+        <button
+          onClick={() => setShowGrid(!showGrid)}
+          className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors shadow-md"
+        >
+          {showGrid ? "Hide Grid" : "Show Grid"}
+        </button>
       </div>
-      <div className="w-full max-w-[95vw] md:max-w-[600px] aspect-square">
+      <div className="w-full max-w-[95vw] md:max-w-[540px] aspect-square">
         <div className="grid grid-cols-20 gap-0 bg-gray-800 border-2 border-gray-700 rounded-lg shadow-lg w-full h-full">
           {renderGrid()}
         </div>
