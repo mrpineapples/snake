@@ -73,7 +73,8 @@ export default function SnakeGame() {
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
-      if (!(e.target as HTMLElement).closest("button")) {
+      const target = e.target as HTMLElement;
+      if (!target.closest("button")) {
         e.preventDefault();
       }
       const touch = e.touches[0];
@@ -81,7 +82,8 @@ export default function SnakeGame() {
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!(e.target as HTMLElement).closest("button")) {
+      const target = e.target as HTMLElement;
+      if (!target.closest("button")) {
         e.preventDefault();
       }
       if (!touchStart || gameOver || isPaused) return;
@@ -128,7 +130,7 @@ export default function SnakeGame() {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [direction, gameOver, isPaused, touchStart]);
+  }, [direction, gameOver, isPaused, touchStart, isGameStarted, setDirection, setIsGameStarted, setTouchStart]);
 
   const generateFood = useCallback((): void => {
     let newFood: Position;
@@ -196,7 +198,15 @@ export default function SnakeGame() {
       newSnake.unshift(head);
       return newSnake;
     });
-  }, [direction, food, gameOver, generateFood, gridSize, isPaused]);
+  }, [
+    direction,
+    food,
+    gameOver,
+    generateFood,
+    gridSize,
+    isPaused,
+    isGameStarted,
+  ]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -236,7 +246,7 @@ export default function SnakeGame() {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [direction, gameOver, isPaused]);
+  }, [direction, gameOver, isPaused, isGameStarted]);
 
   useEffect(() => {
     const gameLoop = setInterval(moveSnake, 150);
@@ -307,7 +317,7 @@ export default function SnakeGame() {
     >
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
       {!isGameStarted && !gameOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
           <div className="text-center animate-[bounce_2s_ease-in-out_infinite] transition-all">
             <div className="grid grid-cols-3 gap-4 p-4 relative min-w-[320px] min-h-[320px] place-items-center">
               <div></div>
@@ -388,19 +398,21 @@ export default function SnakeGame() {
         )}
       </div>
       {gameOver && (
-        <div className="mt-6 text-center">
-          <p className="text-2xl md:text-3xl font-bold text-red-500 mb-4">
-            Game Over!
-          </p>
-          <button
-            onClick={resetGame}
-            className={clsx(
-              "px-6 py-3 text-white text-lg rounded-lg transition-colors shadow-md",
-              "bg-green-500 hover:bg-green-600"
-            )}
-          >
-            Play Again
-          </button>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
+          <div className="text-center">
+            <p className="text-4xl md:text-5xl font-bold text-red-500 mb-6">
+              Game Over!
+            </p>
+            <button
+              onClick={resetGame}
+              className={clsx(
+                "px-6 py-3 text-white text-lg rounded-lg transition-colors shadow-md",
+                "bg-green-500 hover:bg-green-600"
+              )}
+            >
+              Play Again
+            </button>
+          </div>
         </div>
       )}
     </div>
