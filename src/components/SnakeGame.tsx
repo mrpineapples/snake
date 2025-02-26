@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Sun, Moon } from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -290,8 +291,33 @@ export default function SnakeGame() {
     >
       <div className="mb-6 text-3xl md:text-4xl font-bold">Snake Game</div>
       {!isGameStarted && !gameOver && (
-        <div className="mb-4 text-xl text-center">
-          Press an arrow key to start the game
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+          <div className="text-center animate-[bounce_2s_ease-in-out_infinite] transition-all">
+            <div className="grid grid-cols-3 gap-4 p-4 relative w-[280px] h-[280px] place-items-center">
+              <div></div>
+              <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                <ArrowUp size={36} />
+              </div>
+              <div></div>
+              <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                <ArrowLeft size={36} />
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="text-xl md:text-2xl font-bold text-white text-center max-w-[140px] leading-tight">
+                  Use arrows
+                  or swipe
+                </div>
+              </div>
+              <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                <ArrowRight size={36} />
+              </div>
+              <div></div>
+              <div className="text-white flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                <ArrowDown size={36} />
+              </div>
+              <div></div>
+            </div>
+          </div>
         </div>
       )}
       <div className="mb-4 flex items-center justify-between w-full max-w-[540px]">
@@ -328,7 +354,7 @@ export default function SnakeGame() {
                 : "bg-indigo-500 hover:bg-indigo-600 text-white"
             )}
           >
-            {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
         </div>
       </div>
